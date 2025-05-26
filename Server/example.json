@@ -1,0 +1,7 @@
+{
+    "HOST": "0.0.0.0",
+    "PORT": 7777,
+    "fqdn": "HOST.EXAMPLE.CORP",
+    "domain": "EXAMPLE.CORP",
+    "search_base": "DC=EXAMPLE,DC=CORP"
+}
