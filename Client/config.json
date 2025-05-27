@@ -1,5 +1,6 @@
 {
   "host": "HOST_IP",
   "port":7777,
-  "domain":"DOMINIO.CORP"
+  "domain":"DOMINIO.CORP",
+  "ou_filter":"Nan"
 }
