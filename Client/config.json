@@ -1,4 +1,5 @@
 {
   "host": "HOST_IP",
-  "port": 7777
+  "port":7777,
+  "domain":"DOMINIO.CORP"
 }
