@@ -42,6 +42,7 @@ def main():
         #desbloquearConta
         #alterarID
         #alterarSenha
+        #autenticar
 
         alvo = input(f"""ID do usuário: """)
         resposta = request(f"pesquisarUsuario|{alvo}|Nan")
