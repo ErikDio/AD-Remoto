@@ -18,7 +18,7 @@ with open(CONFIG_PATH, "r") as f:
 HOST = config.get("HOST", "0.0.0.0")
 PORT = config.get("PORT", 7777)
 TIMEOUT = 300  # 5 minutes
-
+SESSION:ad_helper = []
 log = log.Log_Handler()
 
 def handle_request(data: str):
