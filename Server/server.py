@@ -47,8 +47,10 @@ def client_thread(conn, addr):
                     break
 
                 decoded_data = data.decode('utf-8').strip()
-                log.write(f"Received from {addr}: {decoded_data}")
-
+                if "autenticar" in decoded_data:
+                    log.write(f"Received login request from {addr}")
+                else:
+                    log.write(f"Received from {addr}: {decoded_data}")
                 if "ping" in decoded_data.lower():
                     conn.sendall("pong".encode('utf-8'))
                     continue
