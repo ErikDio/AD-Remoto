@@ -4,7 +4,7 @@ import sys, os
 import tkinter as tk
 from tkinter import simpledialog, messagebox
 import json
-import token_manager
+from token_manager import TokenManager as TokenManager
 
 config:dict
 
@@ -16,11 +16,12 @@ CONFIG_PATH = os.path.join(base_path, "config.json")
 with open(CONFIG_PATH, "r") as f:
     config = json.load(f)
 
+TokenManager.set_token()
+
 HOST = config.get("host")
 PORT = config.get("port",7777)
 DOMAIN = config.get("domain")
 FILTER = config.get("ou_filter")
-TOKEN = ""
 
 def main():
     global usuario
@@ -82,7 +83,11 @@ Q - Sair
 
 
 def request(pedido):
-    msg = f'{TOKEN}|{pedido}'#usuario|senha|operação|alvo|detalhe
+    msg:str = ""
+    try:
+        msg = f'{TokenManager.get_token()}|{pedido}'#token|operação|alvo|detalhe
+    except ValueError as e:
+        return str(e)
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.connect((HOST, PORT))
         s.sendall(msg.encode('utf-8'))
@@ -96,7 +101,6 @@ def request(pedido):
 
 def run_gui():
     def authenticate():
-        global TOKEN
         user = entry_user.get()
         pwd = entry_pass.get()
         if not user or not pwd:
@@ -107,12 +111,7 @@ def run_gui():
         if request("ping") != "ok":
             messagebox.showerror("Erro", "Falha na conexão com o servidor.")
             return
-        raw_msg = request(f"{usuario}|{senha}|autenticar|Nan")
-        msg = ""
-        if ("|" in raw_msg):
-            msg, TOKEN = raw_msg.split("|")
-        else:
-            msg = raw_msg
+        msg = request(f"{usuario}|{senha}|autenticar|Nan")
         if msg != "ok":
             messagebox.showerror("Erro", "Usuário ou senha inválidos.")
             return
