@@ -4,7 +4,7 @@ import sys, os
 import tkinter as tk
 from tkinter import simpledialog, messagebox
 import json
-from token_manager import TokenManager as TokenManager
+from token_manager import TokenManager
 
 config:dict
 

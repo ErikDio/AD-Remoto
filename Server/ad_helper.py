@@ -5,7 +5,7 @@ import log
 import json
 import os
 
-from token_manager import TokenManager as TokenManager
+from token_manager import TokenManager
 
 log = log.Log_Handler()
 
