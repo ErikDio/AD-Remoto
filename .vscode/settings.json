@@ -1,0 +1,4 @@
+{
+  "python.analysis.extraPaths": ["./shared"],
+  "python.autoComplete.extraPaths": ["./shared"]
+}
