@@ -100,14 +100,16 @@ def request(pedido):
             return resposta
 
 def run_gui():
+    current_dn:str = None
+
     def authenticate():
         user = entry_user.get()
-        pwd = entry_pass.get()
-        if not user or not pwd:
+        password = entry_pass.get()
+        if not user or not password:
             messagebox.showerror("Erro", "Usuário e senha são obrigatórios.")
             return
         usuario = f"{user}@{DOMAIN}"
-        senha = pwd
+        senha = password
         if request("ping") != "ok":
             messagebox.showerror("Erro", "Falha na conexão com o servidor.")
             return
@@ -133,15 +135,15 @@ def run_gui():
         btn_unlock.config(state=tk.NORMAL)
         btn_pass.config(state=tk.NORMAL)
         btn_id.config(state=tk.NORMAL)
-        frame_actions.dn = dn
+        current_dn = dn
 
     def desbloquear():
-        dn = frame_actions.dn
+        dn = current_dn
         resposta = request(f"desbloquearConta|{dn}|Nan")
         messagebox.showinfo("Resultado", "Sucesso ao desbloquear a conta." if resposta == "ok" else "Erro ao desbloquear a conta.")
 
     def alterar_senha():
-        dn = frame_actions.dn
+        dn = current_dn
         nova = simpledialog.askstring("Nova Senha", "Digite a nova senha:", show='*')
         if not nova:
             return
@@ -149,7 +151,7 @@ def run_gui():
         messagebox.showinfo("Resultado", "Sucesso ao alterar a senha." if resposta == "ok" else "Erro ao alterar a senha.")
 
     def alterar_id():
-        dn = frame_actions.dn
+        dn = current_dn
         novo = simpledialog.askstring("Novo ID", "Digite o novo ID:")
         if not novo:
             return

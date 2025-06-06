@@ -5,6 +5,8 @@ import log
 import json
 import os
 
+from Shared.operations import Operation
+
 from token_manager import TokenManager
 
 log = log.Log_Handler()
@@ -39,7 +41,7 @@ class Operation():
             password=bind_password,
             authentication=SIMPLE,
             auto_bind=True)
-            if (self.operation == "autenticar"):
+            if (self.operation == "authenticate"):
                 log.write("Conectado")
                 self.conn.unbind()
                 return_var = "ok"
@@ -51,20 +53,20 @@ class Operation():
             self.output = return_var
             return
         match self.operation:
-            case "pesquisarUsuario":
-                return_var = self.pesquisarUsuario()
-            case "desbloquearConta":
-                return_var = self.desbloquearConta()
-            case "alterarID":
-                return_var = self.alterarID()
-            case "alterarSenha":
-                return_var = self.alterarSenha()
+            case "searchUser":
+                return_var = self.searchUser()
+            case "unlockAccount":
+                return_var = self.unlockAccount()
+            case "changeID":
+                return_var = self.changeID()
+            case "changePassword":
+                return_var = self.changePassword()
         log.write(return_var)
         self.conn.unbind()
         self.output = return_var
 
     # 1. Connect to the LDAP server
-    def pesquisarUsuario(self):
+    def searchUser(self):
         # 2. Search for the user
         self.conn.search(
             self.search_base,
@@ -81,14 +83,14 @@ class Operation():
             return f"{user_entry.cn}|{user_dn}"
                 
                 
-    def desbloquearConta(self):
+    def unlockAccount(self):
         self.conn.extend.microsoft.unlock_account(self.target_username)
         if(self.conn.result['result'] == 0):
             log.write("Conta desbloqueada")
             return "ok"
         else:
             return "erro"
-    def alterarID(self):
+    def changeID(self):
         new_logon_id = self.detail
         domain = config.get("domain")
         self.conn.modify(self.target_username, {
@@ -101,7 +103,7 @@ class Operation():
         else:
             return "erro"
 
-    def alterarSenha(self):
+    def changePassword(self):
         # 3. Reset password (Windows requires SSL or StartTLS for password changes)
         new_password = self.detail
         self.conn.extend.microsoft.unlock_account(self.target_username)
@@ -110,3 +112,6 @@ class Operation():
             return "Alterado"
         else:
             return "Erro"
+        
+    def disconnect(self): #Encerra a sessão
+        self.conn.unbind()
