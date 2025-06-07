@@ -1,17 +1,16 @@
+from datetime import datetime
+
 class TokenManager:
     token:dict = {}
     @classmethod
-
-    def validate(cls, request_token): #Realiza validação do Token
-        if request_token in cls.token.keys():
-            return "placeholder"
-        else:
+    def validate(cls, request_token):
+        try:
+            if cls.token[request_token]["expires"] < now:
+                return "placeholder"
+        except KeyError:
             return "error"
-    
-    @classmethod
-    def add_token(cls, token, instance): #Adiciona um novo token e o atribui a uma instância
-        pass
 
     @classmethod
-    def get_token(cls):
-        raise NotImplementedError("This method should be implemented by subclasses")
+    def add_token(cls, request_token, object_id):
+        expiration = placeholder
+        cls.token[request_token] = {"expires":expiration, "object":object_id}
