@@ -64,7 +64,7 @@ def run_gui():
 
     def pesquisar_usuario() -> None:
         user_id = entry_id.get()
-        resposta = request(f"{oplist.SEACHR_USER}|{user_id}|Nan")
+        resposta = request(f"{oplist.SEARCH_USER}|{user_id}|Nan")
         if resposta == "Nan":
             messagebox.showerror("Erro", "Usuário não encontrado.")
             return

@@ -52,7 +52,7 @@ class Operation():
             self.output = return_var
             return
         match self.operation:
-            case oplist.SEACHR_USER:
+            case oplist.SEARCH_USER:
                 return_var = self.searchUser()
             case oplist.UNLOCK_ACCOUNT:
                 return_var = self.unlockAccount()
