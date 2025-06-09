@@ -24,65 +24,6 @@ PORT = config.get("port",7777)
 DOMAIN = config.get("domain")
 FILTER = config.get("ou_filter")
 
-def main():
-    global usuario
-    global senha
-    if (request("ping") == "ok"):
-        "Conexão bem sucedida"
-    while True:    
-        usuario = input("Usuário (adm): ")+"@"+DOMAIN
-        senha = getpass.getpass("Senha: ")
-        pedido = "autenticar|Nan|Nan"
-        resultado = request(pedido)
-        if resultado!="ok":
-            continue
-        break
-
-    while True:
-        #Operações válidas:
-        #pesquisarUsuario
-        #desbloquearConta
-        #alterarID
-        #alterarSenha
-        #autenticar
-
-        alvo = input(f"""ID do usuário: """)
-        resposta = request(f"pesquisarUsuario|{alvo}|Nan")
-        if resposta == "Nan":
-            continue
-        else:
-            resposta, alvo_dn = resposta.split("|")
-            print(f"Usuário: {resposta}")
-            if(FILTER=="Nan"):
-               continue
-            elif (FILTER not in alvo_dn):
-                print("O usuário está fora da OU ")
-                continue
-            while True:
-                operacao = input(f"""\n1 - Desbloquear
-2 - Alterar Senha
-3 - Alterar ID
-0 - Outro usuário
-Q - Sair
-""").lower()
-                match operacao:
-                    case "1":
-                        resposta = request(f"desbloquearConta|{alvo_dn}|Nan")
-                        print(f"{"Sucesso" if resposta == "ok" else "Erro"} ao desbloquear a conta.")
-                    case "2":
-                        nova_senha = getpass.getpass("Digite a nova senha: ")
-                        request(f"alterarSenha|{alvo_dn}|{nova_senha}")
-                        print(f"{"Sucesso" if resposta == "ok" else "Erro"} ao alterar a senha.")
-                    case "3":
-                        novoID = input("Digite o novo ID: ")
-                        resposta = request(f"alterarID|{alvo_dn}|{novoID}")
-                        print(f"{"Sucesso" if resposta == "ok" else "Erro"} ao alterar o ID.")
-                    case "0":
-                        break
-                    case "q":
-                        sys.exit()
-
-
 def request(pedido):
     msg:str = ""
     try:
