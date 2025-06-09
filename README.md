@@ -1,4 +1,4 @@
-# AD-Remoto
+# AD-Remoto (WIP)
 
 A simple Python server for Active Directory (AD) remote operations.
 
