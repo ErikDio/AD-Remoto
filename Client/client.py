@@ -38,7 +38,6 @@ def request(pedido):
         if pedido == "ping":
             return "ok" if data else "erro"
         else:
-            #print(resposta)
             return resposta
 
 def run_gui():
@@ -137,4 +136,3 @@ def run_gui():
 
 if __name__ == "__main__":
     run_gui()
-    # main()  # CLI preserved, but now GUI is default
