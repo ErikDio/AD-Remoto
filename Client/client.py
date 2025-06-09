@@ -24,7 +24,7 @@ PORT = config.get("port",7777)
 DOMAIN = config.get("domain")
 FILTER = config.get("ou_filter")
 
-def request(pedido):
+def request(pedido) -> str:
     msg:str = ""
     try:
         msg = f'{TokenManager.get_token()}|{pedido}'#token|operação|alvo|detalhe
@@ -43,7 +43,7 @@ def request(pedido):
 def run_gui():
     current_dn:str = None
 
-    def authenticate():
+    def authenticate() -> None:
         user = entry_user.get()
         password = entry_pass.get()
         if not user or not password:
@@ -62,7 +62,7 @@ def run_gui():
         frame_login.pack_forget()
         frame_main.pack()
 
-    def pesquisar_usuario():
+    def pesquisar_usuario() -> None:
         user_id = entry_id.get()
         resposta = request(f"{oplist.SEACHR_USER}|{user_id}|Nan")
         if resposta == "Nan":
@@ -78,12 +78,12 @@ def run_gui():
         btn_id.config(state=tk.NORMAL)
         current_dn = dn
 
-    def desbloquear():
+    def desbloquear() -> None:
         dn = current_dn
         resposta = request(f"{oplist.UNLOCK_ACCOUNT}|{dn}|Nan")
         messagebox.showinfo("Resultado", "Sucesso ao desbloquear a conta." if resposta == "ok" else "Erro ao desbloquear a conta.")
 
-    def alterar_senha():
+    def alterar_senha() -> None:
         dn = current_dn
         nova = simpledialog.askstring("Nova Senha", "Digite a nova senha:", show='*')
         if not nova:
@@ -91,7 +91,7 @@ def run_gui():
         resposta = request(f"{oplist.CHANGE_PASSWORD}|{dn}|{nova}")
         messagebox.showinfo("Resultado", "Sucesso ao alterar a senha." if resposta == "ok" else "Erro ao alterar a senha.")
 
-    def alterar_id():
+    def alterar_id() -> None:
         dn = current_dn
         novo = simpledialog.askstring("Novo ID", "Digite o novo ID:")
         if not novo:

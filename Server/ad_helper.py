@@ -20,7 +20,6 @@ CONFIG_PATH = os.path.join(base_path, "config.json")
 with open(CONFIG_PATH, "r") as f:
     config = json.load(f)
 
-# Configuration
 class Operation():
     fqdn = config.get("domain")
     search_base = config.get("search_base")
@@ -65,9 +64,7 @@ class Operation():
         self.conn.unbind()
         self.output = return_var
 
-    # 1. Connect to the LDAP server
-    def searchUser(self):
-        # 2. Search for the user
+    def searchUser(self) -> str:
         self.conn.search(
             self.search_base,
             f'(&(objectClass=user)(sAMAccountName={self.target_username}))',
@@ -83,14 +80,14 @@ class Operation():
             return f"{user_entry.cn}|{user_dn}"
                 
                 
-    def unlockAccount(self):
+    def unlockAccount(self) -> str:
         self.conn.extend.microsoft.unlock_account(self.target_username)
         if(self.conn.result['result'] == 0):
             log.write("Conta desbloqueada")
             return "ok"
         else:
             return "erro"
-    def changeID(self):
+    def changeID(self) -> str:
         new_logon_id = self.detail
         domain = config.get("domain")
         self.conn.modify(self.target_username, {
@@ -103,8 +100,7 @@ class Operation():
         else:
             return "erro"
 
-    def changePassword(self):
-        # 3. Reset password (Windows requires SSL or StartTLS for password changes)
+    def changePassword(self) -> str:
         new_password = self.detail
         self.conn.extend.microsoft.unlock_account(self.target_username)
         self.conn.extend.microsoft.modify_password(self.target_username, new_password)
@@ -113,5 +109,5 @@ class Operation():
         else:
             return "Erro"
         
-    def disconnect(self): #Encerra a sessão
+    def disconnect(self) -> None: #Encerra a sessão
         self.conn.unbind()

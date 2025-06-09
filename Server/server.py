@@ -21,7 +21,7 @@ TIMEOUT = 300  # 5 minutes
 SESSION:ad_helper = []
 log = log.Log_Handler()
 
-def handle_request(data: str):
+def handle_request(data: str) -> str:
     try:
         user, password, operation, target, details = data.strip().split('|', 4)
         ad_return = ad_helper.Operation(
@@ -35,7 +35,7 @@ def handle_request(data: str):
     except ValueError:
         return 'Erro'
 
-def client_thread(conn, addr):
+def client_thread(conn, addr) -> None:
     conn.settimeout(TIMEOUT)
     log.write(f"Connection established with {addr}")
     with conn:
@@ -71,13 +71,17 @@ def client_thread(conn, addr):
                 break
 
     log.write(f"Connection closed with {addr}")
+    
+def main():
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.bind((HOST, PORT))
+        s.listen()
+        log.write(f"Server listening on port {PORT}...")
 
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    s.bind((HOST, PORT))
-    s.listen()
-    log.write(f"Server listening on port {PORT}...")
+        while True:
+            conn, addr = s.accept()
+            thread = threading.Thread(target=client_thread, args=(conn, addr), daemon=True)
+            thread.start()
 
-    while True:
-        conn, addr = s.accept()
-        thread = threading.Thread(target=client_thread, args=(conn, addr), daemon=True)
-        thread.start()
+if __name__ == "__main__":
+    main()

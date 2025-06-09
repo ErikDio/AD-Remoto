@@ -4,15 +4,15 @@ class TokenManager:
     token:str = None
 
     @classmethod
-    def set_token(cls):
+    def set_token(cls) -> None:
         cls.token = secrets.token_hex(32)
     
     @classmethod
-    def get_token(cls):
+    def get_token(cls) -> str:
         if cls.token != None:
             return cls.token
         raise ValueError("Token inválido")
 
     @classmethod
-    def clear_token(cls):
+    def clear_token(cls) -> None:
         cls.token = None
