@@ -5,7 +5,7 @@ import log
 import json
 import os
 
-from Shared.operations import Operation
+from Shared.operations import OperationList as oplist
 
 from token_manager import TokenManager
 
@@ -26,7 +26,7 @@ class Operation():
     search_base = config.get("search_base")
     operation = ""
     conn:Connection = None
-
+    
     def __init__(self, user, password, op, target, det):
         bind_user = user
         bind_password = password
@@ -41,7 +41,7 @@ class Operation():
             password=bind_password,
             authentication=SIMPLE,
             auto_bind=True)
-            if (self.operation == "authenticate"):
+            if (self.operation == oplist.AUTHENTICATE):
                 log.write("Conectado")
                 self.conn.unbind()
                 return_var = "ok"
@@ -53,13 +53,13 @@ class Operation():
             self.output = return_var
             return
         match self.operation:
-            case "searchUser":
+            case oplist.SEACHR_USER:
                 return_var = self.searchUser()
-            case "unlockAccount":
+            case oplist.UNLOCK_ACCOUNT:
                 return_var = self.unlockAccount()
-            case "changeID":
+            case oplist.CHANGE_ID:
                 return_var = self.changeID()
-            case "changePassword":
+            case oplist.CHANGE_PASSWORD:
                 return_var = self.changePassword()
         log.write(return_var)
         self.conn.unbind()
