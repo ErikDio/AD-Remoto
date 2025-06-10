@@ -1,5 +1,4 @@
 import socket
-import getpass
 import sys, os
 import tkinter as tk
 from tkinter import simpledialog, messagebox
