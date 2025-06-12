@@ -13,3 +13,4 @@ class ErrorList(Enum):
 class ReturnList(Enum):
     OPERATION_OK = "ok"
     OPERATION_ERROR = "error"
+    NOT_FOUND = "notFound"
