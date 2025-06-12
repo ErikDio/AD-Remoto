@@ -5,3 +5,11 @@ class OperationList(Enum):
     CHANGE_PASSWORD ="changePassword"
     SEARCH_USER = "searchUser"
     UNLOCK_ACCOUNT = "unlockAccount"
+
+class ErrorList(Enum):
+    EXPIRED_TOKEN = "expired"
+    INVALID_TOKEN = "invalid"
+
+class ReturnList(Enum):
+    OPERATION_OK = "ok"
+    OPERATION_ERROR = "error"
