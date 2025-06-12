@@ -3,7 +3,7 @@ import time
 class TokenManager:
     token:dict = {}
     @classmethod
-    def validate(cls, request_token):
+    def validate(cls, request_token) -> str:
         try:
             if cls.token[request_token]["expires"] < time.time():
                 return "placeholder"
