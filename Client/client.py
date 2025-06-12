@@ -50,11 +50,11 @@ def run_gui():
             return
         usuario = f"{user}@{DOMAIN}"
         senha = password
-        if request("ping") != "ok":
+        if request("ping") != ReturnList.OPERATION_OK:
             messagebox.showerror("Erro", "Falha na conexão com o servidor.")
             return
         msg = request(f"{usuario}|{senha}|{OperationList.AUTHENTICATE}|Nan")
-        if msg != "ok":
+        if msg != ReturnList.OPERATION_OK:
             messagebox.showerror("Erro", "Usuário ou senha inválidos.")
             return
         
@@ -68,7 +68,7 @@ def run_gui():
             messagebox.showerror("Erro", "Usuário não encontrado.")
             return
         info, dn = resposta.split("|")
-        if(FILTER not in ("Nan", dn)):
+        if(FILTER != "Nan" and FILTER not in dn):
             messagebox.showerror("Erro", "O usuário está fora da OU {FILTER}.")
             return
         label_info.config(text=f"Usuário: {info}")

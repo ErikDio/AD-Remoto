@@ -4,6 +4,7 @@ import log
 import json
 import os, sys
 
+from Shared.operations import *
 import ad_helper
 
 
@@ -35,7 +36,7 @@ def handle_request(data: str) -> str:
         )
         return ad_return.output
     except ValueError:
-        return 'Erro'
+        return ReturnList.OPERATION_ERROR
 
 def client_thread(conn, addr) -> None:
     conn.settimeout(TIMEOUT)
@@ -49,7 +50,7 @@ def client_thread(conn, addr) -> None:
                     break
 
                 decoded_data = data.decode('utf-8').strip()
-                if "autenticar" in decoded_data:
+                if OperationList.AUTHENTICATE in decoded_data:
                     log.write(f"Received login request from {addr}")
                 else:
                     log.write(f"Received from {addr}: {decoded_data}")

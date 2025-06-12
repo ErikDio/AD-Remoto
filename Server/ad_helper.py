@@ -43,12 +43,12 @@ class Operation():
             if (self.operation == OperationList.AUTHENTICATE):
                 log.write("Conectado")
                 self.conn.unbind()
-                return_var = "ok"
+                return_var = ReturnList.OPERATION_OK
                 self.output = return_var
 
         except ldap3.core.exceptions.LDAPBindError:
             log.write("Erro ao autenticar.")
-            return_var = "Fatal"
+            return_var = ReturnList.OPERATION_ERROR
             self.output = return_var
             return
         match self.operation:
@@ -73,7 +73,7 @@ class Operation():
 
         if not self.conn.entries:
             log.write(f"User {self.target_username} not found.")
-            return "Nan"
+            return ReturnList.NOT_FOUND
         else:
             user_entry:Entry = self.conn.entries[0]
             user_dn = user_entry.entry_dn
@@ -84,9 +84,9 @@ class Operation():
         self.conn.extend.microsoft.unlock_account(self.target_username)
         if(self.conn.result['result'] == 0):
             log.write("Conta desbloqueada")
-            return "ok"
+            return ReturnList.OPERATION_OK
         else:
-            return "erro"
+            return ReturnList.OPERATION_ERROR
     def changeID(self) -> str:
         new_logon_id = self.detail
         domain = config.get("domain")
@@ -96,18 +96,18 @@ class Operation():
         })
         if(self.conn.result['result'] == 0):
             log.write(f"ID alterado para {new_logon_id}")
-            return f"ok"
+            return ReturnList.OPERATION_OK
         else:
-            return "erro"
+            return ReturnList.OPERATION_ERROR
 
     def changePassword(self) -> str:
         new_password = self.detail
         self.conn.extend.microsoft.unlock_account(self.target_username)
         self.conn.extend.microsoft.modify_password(self.target_username, new_password)
         if(self.conn.result['result'] == 0):
-            return "Alterado"
+            return ReturnList.OPERATION_OK
         else:
-            return "Erro"
+            return ReturnList.OPERATION_ERROR
         
     def disconnect(self) -> None: #Encerra a sessão
         self.conn.unbind()
