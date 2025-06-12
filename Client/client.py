@@ -4,7 +4,7 @@ import tkinter as tk
 from tkinter import simpledialog, messagebox
 import json
 from token_manager import TokenManager
-from Shared.operations import OperationList as oplist
+from Shared.operations import *
 
 config:dict
 
@@ -53,7 +53,7 @@ def run_gui():
         if request("ping") != "ok":
             messagebox.showerror("Erro", "Falha na conexão com o servidor.")
             return
-        msg = request(f"{usuario}|{senha}|{oplist.AUTHENTICATE}|Nan")
+        msg = request(f"{usuario}|{senha}|{OperationList.AUTHENTICATE}|Nan")
         if msg != "ok":
             messagebox.showerror("Erro", "Usuário ou senha inválidos.")
             return
@@ -63,7 +63,7 @@ def run_gui():
 
     def pesquisar_usuario() -> None:
         user_id = entry_id.get()
-        resposta = request(f"{oplist.SEARCH_USER}|{user_id}|Nan")
+        resposta = request(f"{OperationList.SEARCH_USER}|{user_id}|Nan")
         if resposta == "Nan":
             messagebox.showerror("Erro", "Usuário não encontrado.")
             return
@@ -79,7 +79,7 @@ def run_gui():
 
     def desbloquear() -> None:
         dn = current_dn
-        resposta = request(f"{oplist.UNLOCK_ACCOUNT}|{dn}|Nan")
+        resposta = request(f"{OperationList.UNLOCK_ACCOUNT}|{dn}|Nan")
         messagebox.showinfo("Resultado", "Sucesso ao desbloquear a conta." if resposta == "ok" else "Erro ao desbloquear a conta.")
 
     def alterar_senha() -> None:
@@ -87,7 +87,7 @@ def run_gui():
         nova = simpledialog.askstring("Nova Senha", "Digite a nova senha:", show='*')
         if not nova:
             return
-        resposta = request(f"{oplist.CHANGE_PASSWORD}|{dn}|{nova}")
+        resposta = request(f"{OperationList.CHANGE_PASSWORD}|{dn}|{nova}")
         messagebox.showinfo("Resultado", "Sucesso ao alterar a senha." if resposta == "ok" else "Erro ao alterar a senha.")
 
     def alterar_id() -> None:
@@ -95,7 +95,7 @@ def run_gui():
         novo = simpledialog.askstring("Novo ID", "Digite o novo ID:")
         if not novo:
             return
-        resposta = request(f"{oplist.CHANGE_ID}|{dn}|{novo}")
+        resposta = request(f"{OperationList.CHANGE_ID}|{dn}|{novo}")
         messagebox.showinfo("Resultado", "Sucesso ao alterar o ID." if resposta == "ok" else "Erro ao alterar o ID.")
 
     root = tk.Tk()
