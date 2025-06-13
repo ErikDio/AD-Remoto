@@ -63,6 +63,9 @@ class Operation():
         log.write(return_var)
         self.conn.unbind()
         self.output = return_var
+        
+    def handleRequest(self, ) -> str:
+        pass
 
     def searchUser(self) -> str:
         self.conn.search(

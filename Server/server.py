@@ -21,14 +21,14 @@ with open(CONFIG_PATH, "r") as f:
 HOST = config.get("HOST", "0.0.0.0")
 PORT = config.get("PORT", 7777)
 TIMEOUT = 300  # 5 minutes
-SESSION:dict = {} #Example: SESSION{"123456":ad_helper_session}
+SESSION:dict[str, ad_helper.Operation] = {} #Example: SESSION{"123456":ad_helper_session}
 log = log.Log_Handler()
 
 def handle_login(stripped_data: str) -> str:
     if(len(stripped_data) == 3):
         token, id, password = stripped_data
-        if (token not in SESSION):
-            t_SESSION:ad_helper = ad_helper(id=id, password=password)
+        if (token not in SESSION.keys()):
+            t_SESSION = ad_helper.Operation(id=id, password=password)
             if (t_SESSION.output == ReturnList.OPERATION_OK):
                 SESSION[token] = t_SESSION
                 TokenManager.add_token(token)
@@ -46,10 +46,16 @@ def handle_login(stripped_data: str) -> str:
 def handle_request(data: str) -> str:
     try:
         stripped_data = data.strip().split("|")
+        if len(stripped_data <= 2):
+            log.write("Invalid request.")
+            raise ValueError
+        token = stripped_data[0]
         if(OperationList.AUTHENTICATE in stripped_data):
             return handle_login(stripped_data=stripped_data)
         else:
-            pass
+            TokenManager.auth(token)
+            SESSION[token]
+            return SESSION[token].output
         """user, password, operation, target, details = data.strip().split('|', 4)
         ad_return = ad_helper.Operation(
             user=user,
