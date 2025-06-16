@@ -3,10 +3,15 @@ import threading
 import log
 import json
 import os, sys
+from typing import TypedDict
 
 from Shared.operations import *
 import ad_helper
 from token_manager import TokenManager
+
+class SessionDict(TypedDict):
+    user: str
+    session: ad_helper.Operation
 
 config:dict
 # Load configuration from config.json (support frozen apps)
@@ -20,12 +25,12 @@ with open(CONFIG_PATH, "r") as f:
 
 HOST = config.get("HOST", "0.0.0.0")
 PORT = config.get("PORT", 7777)
-TIMEOUT = 300  # 5 minutes
-SESSION:dict[str[str, ad_helper.Operation]] = {} #Example: SESSION{"token":{"user":"Erik Dio", "session":ad_helper_session}}
+TIMEOUT = 300  #Seconds
+SESSION:dict[str, SessionDict] = {} #Example: SESSION{"token":{"user":"Erik Dio", "session":ad_helper_session}}
 log = log.Log_Handler()
 
 def handle_login(stripped_data: str) -> str:
-    if(len(stripped_data) == 3):
+    if(OperationList.AUTHENTICATE in stripped_data):
         token, id, password = stripped_data
         if (token not in SESSION.keys()):
             t_SESSION = ad_helper.Operation(id=id, password=password)
@@ -51,11 +56,12 @@ def handle_request(data: str) -> str:
             raise ValueError
         token = stripped_data[0]
         if(OperationList.AUTHENTICATE in stripped_data):
+            
             return handle_login(stripped_data=stripped_data)
         else:
-            TokenManager.auth(token)
-            SESSION[token]
-            return SESSION[token].output
+            auth = TokenManager.auth(token)
+            
+            return SESSION[token]["session"].output
         """user, password, operation, target, details = data.strip().split('|', 4)
         ad_return = ad_helper.Operation(
             user=user,
@@ -98,6 +104,8 @@ def client_thread(conn, addr) -> None:
             except socket.timeout:
                 log.write(f"Connection with {addr} timed out after {TIMEOUT} seconds.")
                 break
+            except ProcessLookupError:
+                log.write(f"")
             except Exception as e:
                 log.write(f"Error with {addr}: {e}")
                 try:
