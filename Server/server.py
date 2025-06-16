@@ -21,7 +21,7 @@ with open(CONFIG_PATH, "r") as f:
 HOST = config.get("HOST", "0.0.0.0")
 PORT = config.get("PORT", 7777)
 TIMEOUT = 300  # 5 minutes
-SESSION:dict[str, ad_helper.Operation] = {} #Example: SESSION{"123456":ad_helper_session}
+SESSION:dict[str[str, ad_helper.Operation]] = {} #Example: SESSION{"token":{"user":"Erik Dio", "session":ad_helper_session}}
 log = log.Log_Handler()
 
 def handle_login(stripped_data: str) -> str:
@@ -30,7 +30,7 @@ def handle_login(stripped_data: str) -> str:
         if (token not in SESSION.keys()):
             t_SESSION = ad_helper.Operation(id=id, password=password)
             if (t_SESSION.output == ReturnList.OPERATION_OK):
-                SESSION[token] = t_SESSION
+                SESSION[token] = {"user":id, "session":t_SESSION}
                 TokenManager.add_token(token)
                 log.write(f"{id} logged in.")
                 return ReturnList.OPERATION_OK
