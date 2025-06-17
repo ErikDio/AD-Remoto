@@ -30,22 +30,19 @@ SESSION:dict[str, SessionDict] = {} #Example: SESSION{"token":{"user":"Erik Dio"
 log = log.Log_Handler()
 
 def handle_login(stripped_data: str) -> str:
-    if(OperationList.AUTHENTICATE in stripped_data):
-        token, id, password = stripped_data
-        if (token not in SESSION.keys()):
-            t_SESSION = ad_helper.Operation(id=id, password=password)
-            if (t_SESSION.output == ReturnList.OPERATION_OK):
-                SESSION[token] = {"user":id, "session":t_SESSION}
-                TokenManager.add_token(token)
-                log.write(f"{id} logged in.")
-                return ReturnList.OPERATION_OK
-            else:
-                log.write(f"Unsuccessful login attempt from {id}.")
-                return ReturnList.OPERATION_ERROR
+    token, id, password = stripped_data
+    if (token not in SESSION.keys()):
+        t_SESSION = ad_helper.Operation(id=id, password=password)
+        if (t_SESSION.output == ReturnList.OPERATION_OK):
+            SESSION[token] = {"user":id, "session":t_SESSION}
+            TokenManager.add_token(token)
+            log.write(f"{id} logged in.")
+            return ReturnList.OPERATION_OK
         else:
-            log.write("Already logged in.")
-            raise ValueError
+            log.write(f"Unsuccessful login attempt from {id}.")
+            return ReturnList.OPERATION_ERROR
     else:
+        log.write("Already logged in.")
         raise ValueError
 
 def handle_request(data: str) -> str:
@@ -56,12 +53,14 @@ def handle_request(data: str) -> str:
             raise ValueError
         token = stripped_data[0]
         if(OperationList.AUTHENTICATE in stripped_data):
-            
             return handle_login(stripped_data=stripped_data)
         else:
             auth = TokenManager.auth(token)
-            
-            return SESSION[token]["session"].output
+            if auth == ReturnList.OPERATION_OK:
+                output = SESSION[token]["session"].handleRequest(stripped_data[1:]) #skips the first item, which should be the token
+                return output
+            else:
+                return auth
         """user, password, operation, target, details = data.strip().split('|', 4)
         ad_return = ad_helper.Operation(
             user=user,
@@ -104,7 +103,7 @@ def client_thread(conn, addr) -> None:
             except socket.timeout:
                 log.write(f"Connection with {addr} timed out after {TIMEOUT} seconds.")
                 break
-            except ProcessLookupError:
+            except SyntaxError:
                 log.write(f"")
             except Exception as e:
                 log.write(f"Error with {addr}: {e}")
