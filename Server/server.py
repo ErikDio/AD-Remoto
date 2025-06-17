@@ -50,7 +50,7 @@ def handle_request(data: str) -> str:
         stripped_data = data.strip().split("|")
         if len(stripped_data <= 2):
             log.write("Invalid request.")
-            raise ValueError
+            raise SyntaxError
         token = stripped_data[0]
         if(OperationList.AUTHENTICATE in stripped_data):
             return handle_login(stripped_data=stripped_data)
@@ -61,18 +61,10 @@ def handle_request(data: str) -> str:
                 return output
             else:
                 return auth
-        """user, password, operation, target, details = data.strip().split('|', 4)
-        ad_return = ad_helper.Operation(
-            user=user,
-            password=password,
-            target=target,
-            op=operation,
-            det=details
-        )
-        return ad_return.output
-        """
-    except ValueError:
+    except SyntaxError:
         return ReturnList.OPERATION_ERROR
+    except Exception as e:
+        return e
 def validate_request(data: str) -> bool:
     if("|" in data):
         return True
