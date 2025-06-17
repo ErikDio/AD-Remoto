@@ -92,11 +92,13 @@ def client_thread(conn, addr) -> None:
                 if(validate_request(decoded_data) == True):
                     response = handle_request(decoded_data)
                     conn.sendall(response.encode('utf-8'))
+                else:
+                    raise SyntaxError
             except socket.timeout:
                 log.write(f"Connection with {addr} timed out after {TIMEOUT} seconds.")
                 break
             except SyntaxError:
-                log.write(f"")
+                log.write(f"Invalid request.")
             except Exception as e:
                 log.write(f"Error with {addr}: {e}")
                 try:
