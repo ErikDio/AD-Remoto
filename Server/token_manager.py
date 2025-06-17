@@ -17,11 +17,10 @@ class TokenManager:
         
     @classmethod
     def auth(cls, request_token:str) -> str:
-        if cls.validate(request_token) == ReturnList.OPERATION_OK:
+        validation = cls.validate(request_token)
+        if (validation == ReturnList.OPERATION_OK):
             cls.token[request_token]["expires"] = expiration_time()
-            return ReturnList.OPERATION_OK
-        else:
-            return ReturnList.OPERATION_ERROR
+        return validation
     
     @classmethod
     def add_token(cls, request_token:str):
