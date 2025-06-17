@@ -9,6 +9,8 @@ class OperationList(Enum):
 class ErrorList(Enum):
     EXPIRED_TOKEN = "expired"
     INVALID_TOKEN = "invalid"
+    INVALID_OPERATION = "invalidOperation"
+    CRITICAL_ERROR = "critical"
 
 class ReturnList(Enum):
     OPERATION_OK = "ok"
