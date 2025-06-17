@@ -51,49 +51,58 @@ class Operation():
             return_var = ReturnList.OPERATION_ERROR
             self.output = return_var
             return
-        match self.operation:
-            case OperationList.SEARCH_USER:
-                return_var = self.searchUser()
-            case OperationList.UNLOCK_ACCOUNT:
-                return_var = self.unlockAccount()
-            case OperationList.CHANGE_ID:
-                return_var = self.changeID()
-            case OperationList.CHANGE_PASSWORD:
-                return_var = self.changePassword()
+        except Exception as e:
+            log.write(f"Erro crítico ao tentar autenticar: {e}")
+            self.output = ErrorList.CRITICAL_ERROR
+            return
         log.write(return_var)
-        self.conn.unbind()
         self.output = return_var
         
-    def handleRequest(self, ) -> str:
-        pass
+    def handleRequest(self, request_aray:list) -> str:
+        # Request array:
+        # 1 - Operation
+        # 2 - Target user CN
+        # 3 - Detail
+        request, target_user, detail = (request_aray+[None]*3)[:3] # Completes with None if necessary
 
-    def searchUser(self) -> str:
+        match request:
+            case OperationList.SEARCH_USER:
+                return self.searchUser()
+            case OperationList.UNLOCK_ACCOUNT:
+                return self.unlockAccount()
+            case OperationList.CHANGE_ID:
+                return self.changeID()
+            case OperationList.CHANGE_PASSWORD:
+                return self.changePassword()
+            case _:
+                return ErrorList.INVALID_OPERATION
+
+    def searchUser(self, target_username:str) -> str:
         self.conn.search(
             self.search_base,
-            f'(&(objectClass=user)(sAMAccountName={self.target_username}))',
+            f'(&(objectClass=user)(sAMAccountName={target_username}))',
             attributes=['distinguishedName', 'sAMAccountName', 'cn']
         )
 
         if not self.conn.entries:
-            log.write(f"User {self.target_username} not found.")
+            log.write(f"User {target_username} not found.")
             return ReturnList.NOT_FOUND
         else:
             user_entry:Entry = self.conn.entries[0]
             user_dn = user_entry.entry_dn
-            return f"{user_entry.cn}|{user_dn}"
+            return f"{ReturnList.OPERATION_OK}|{user_entry.cn}|{user_dn}"
                 
-                
-    def unlockAccount(self) -> str:
-        self.conn.extend.microsoft.unlock_account(self.target_username)
+    def unlockAccount(self, target_username:str) -> str:
+        self.conn.extend.microsoft.unlock_account(target_username)
         if(self.conn.result['result'] == 0):
             log.write("Conta desbloqueada")
             return ReturnList.OPERATION_OK
         else:
             return ReturnList.OPERATION_ERROR
-    def changeID(self) -> str:
-        new_logon_id = self.detail
+    def changeID(self, target_username:str, detail:str) -> str:
+        new_logon_id = detail
         domain = config.get("domain")
-        self.conn.modify(self.target_username, {
+        self.conn.modify(target_username, {
             'sAMAccountName': [(MODIFY_REPLACE, [new_logon_id])],
             'userPrincipalName': [(MODIFY_REPLACE, [f"{new_logon_id}@{domain}"])]
         })
@@ -103,10 +112,10 @@ class Operation():
         else:
             return ReturnList.OPERATION_ERROR
 
-    def changePassword(self) -> str:
-        new_password = self.detail
-        self.conn.extend.microsoft.unlock_account(self.target_username)
-        self.conn.extend.microsoft.modify_password(self.target_username, new_password)
+    def changePassword(self, target_username:str, detail:str) -> str:
+        new_password = detail
+        self.conn.extend.microsoft.unlock_account(target_username)
+        self.conn.extend.microsoft.modify_password(target_username, new_password)
         if(self.conn.result['result'] == 0):
             return ReturnList.OPERATION_OK
         else:
