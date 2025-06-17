@@ -25,8 +25,8 @@ with open(CONFIG_PATH, "r") as f:
 
 HOST = config.get("HOST", "0.0.0.0")
 PORT = config.get("PORT", 7777)
-TIMEOUT = 300  #Seconds
-SESSION:dict[str, SessionDict] = {} #Example: SESSION{"token":{"user":"Erik Dio", "session":ad_helper_session}}
+TIMEOUT = 300  # Seconds
+SESSION:dict[str, SessionDict] = {} # Example: SESSION{"token":{"user":"Erik Dio", "session":ad_helper_session}}
 log = log.Log_Handler()
 
 def handle_login(stripped_data: str) -> str:
