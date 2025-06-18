@@ -1,9 +1,10 @@
 import time
 from Shared.operations import *
+import ad_helper
 
 class TokenManager:
     
-    token:dict = {}
+    token:dict[str, ad_helper.Operation] = {}
 
     @classmethod
     def validate(cls, request_token:str) -> str:
