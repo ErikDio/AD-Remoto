@@ -67,13 +67,13 @@ class Operation():
 
         match request:
             case OperationList.SEARCH_USER:
-                return self.searchUser()
+                return self.searchUser(target_username=target_user)
             case OperationList.UNLOCK_ACCOUNT:
-                return self.unlockAccount()
+                return self.unlockAccount(target_username=target_user)
             case OperationList.CHANGE_ID:
-                return self.changeID()
+                return self.changeID(target_username=target_user, detail=detail)
             case OperationList.CHANGE_PASSWORD:
-                return self.changePassword()
+                return self.changePassword(target_username=target_user, detail=detail)
             case _:
                 return ErrorList.INVALID_OPERATION
 
