@@ -3,15 +3,10 @@ import threading
 import log
 import json
 import os, sys
-from typing import TypedDict
 
 from Shared.operations import *
 import ad_helper
 from token_manager import TokenManager
-
-class SessionDict(TypedDict):
-    user: str
-    session: ad_helper.Operation
 
 config:dict
 # Load configuration from config.json (support frozen apps)
@@ -26,16 +21,15 @@ with open(CONFIG_PATH, "r") as f:
 HOST = config.get("HOST", "0.0.0.0")
 PORT = config.get("PORT", 7777)
 TIMEOUT = 300  # Seconds
-SESSION:dict[str, SessionDict] = {} # Example: SESSION{"token":{"user":"Erik Dio", "session":ad_helper_session}}
 log = log.Log_Handler()
 
 def handle_login(stripped_data: str) -> str:
     token, id, password = stripped_data
-    if (token not in SESSION.keys()):
+    token_auth:str = TokenManager.auth(token)
+    if (token_auth == ErrorList.INVALID_TOKEN):
         t_SESSION = ad_helper.Operation(id=id, password=password)
         if (t_SESSION.output == ReturnList.OPERATION_OK):
-            SESSION[token] = {"user":id, "session":t_SESSION}
-            TokenManager.add_token(token)
+            TokenManager.add_token(request_token=token,user=id,session=t_SESSION)
             log.write(f"{id} logged in.")
             return ReturnList.OPERATION_OK
         else:
@@ -55,12 +49,13 @@ def handle_request(data: str) -> str:
         if(OperationList.AUTHENTICATE in stripped_data):
             return handle_login(stripped_data=stripped_data)
         else:
-            auth = TokenManager.auth(token)
-            if auth == ReturnList.OPERATION_OK:
-                output = SESSION[token]["session"].handleRequest(stripped_data[1:]) #skips the first item, which should be the token
+            SESSION = TokenManager.auth(token)
+            if(type(SESSION)==dict):
+                output = SESSION["session"].handleRequest(stripped_data[1:]) #stripped_data[1:] does the request while skipping the first item, which should be the token
+                log.write(f"{SESSION["user"]} requested {stripped_data[0]}")
                 return output
             else:
-                return auth
+                return SESSION
     except SyntaxError:
         return ReturnList.OPERATION_ERROR
     except Exception as e:
