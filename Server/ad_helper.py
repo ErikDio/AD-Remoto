@@ -1,13 +1,13 @@
 from ldap3 import Server, Connection, ALL, MODIFY_REPLACE, SIMPLE, Entry
 import ldap3.core.exceptions
 import sys
-import log
+from . import log
 import json
 import os
 
 from Shared.operations import *
 
-from token_manager import TokenManager
+from .token_manager import TokenManager
 
 log = log.Log_Handler()
 

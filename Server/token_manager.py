@@ -1,17 +1,17 @@
 import time
 from typing import TypedDict
-from Shared.operations import *
-import ad_helper
 import threading
+
+from Shared.operations import *
 
 class SessionDict(TypedDict):
         user: str
         expires: float
-        session: ad_helper.Operation
+        session: object
 
-class TokenManager:
-    
+class TokenManager:    
     token:dict[str, SessionDict] = {} # Example: token{"token":{"user":"Erik Dio", "expires":123.123, "session":ad_helper_session}}
+    
     def __init__(self):
         self.thread = threading.Thread(target=self.monitor_token, daemon=True)
         self.thread.run()

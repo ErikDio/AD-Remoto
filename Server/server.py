@@ -1,12 +1,12 @@
 import socket
 import threading
-import log
 import json
 import os, sys
 
+from . import log, ad_helper
 from Shared.operations import *
-import ad_helper
-from token_manager import TokenManager
+
+from .token_manager import TokenManager
 
 config:dict
 # Load configuration from config.json (support frozen apps)
