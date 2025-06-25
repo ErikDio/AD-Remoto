@@ -9,6 +9,10 @@ from Shared.operations import *
 import ad_helper
 from token_manager import TokenManager
 
+class SessionDict(TypedDict):
+    user: str
+    session: ad_helper.Operation
+
 config:dict
 # Load configuration from config.json (support frozen apps)
 if getattr(sys, 'frozen', False):
@@ -22,7 +26,7 @@ with open(CONFIG_PATH, "r") as f:
 HOST = config.get("HOST", "0.0.0.0")
 PORT = config.get("PORT", 7777)
 TIMEOUT = 300  # Seconds
-SESSION:dict[str, ad_helper.Operation] = {} # Example: SESSION{"token":{"user":"Erik Dio", "session":ad_helper_session}}
+SESSION:dict[str, SessionDict] = {} # Example: SESSION{"token":{"user":"Erik Dio", "session":ad_helper_session}}
 log = log.Log_Handler()
 
 def handle_login(stripped_data: str) -> str:
