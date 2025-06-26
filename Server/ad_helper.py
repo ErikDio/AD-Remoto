@@ -40,20 +40,20 @@ class Operation():
             password=bind_password,
             authentication=SIMPLE,
             auto_bind=True)
-            if (self.operation == OperationList.AUTHENTICATE):
+            if (self.operation == OperationList.AUTHENTICATE.value):
                 log.write("Conectado")
                 self.conn.unbind()
-                return_var = ReturnList.OPERATION_OK
+                return_var = ReturnList.OPERATION_OK.value
                 self.output = return_var
 
         except ldap3.core.exceptions.LDAPBindError:
             log.write("Erro ao autenticar.")
-            return_var = ReturnList.OPERATION_ERROR
+            return_var = ReturnList.OPERATION_ERROR.value
             self.output = return_var
             return
         except Exception as e:
             log.write(f"Erro crítico ao tentar autenticar: {e}")
-            self.output = ErrorList.CRITICAL_ERROR
+            self.output = ErrorList.CRITICAL_ERROR.value
             return
         log.write(return_var)
         self.output = return_var
@@ -66,16 +66,16 @@ class Operation():
         request, target_user, detail = (request_aray+[None]*3)[:3] # Completes with None if necessary
 
         match request:
-            case OperationList.SEARCH_USER:
+            case OperationList.SEARCH_USER.value:
                 return self.searchUser(target_username=target_user)
-            case OperationList.UNLOCK_ACCOUNT:
+            case OperationList.UNLOCK_ACCOUNT.value:
                 return self.unlockAccount(target_username=target_user)
-            case OperationList.CHANGE_ID:
+            case OperationList.CHANGE_ID.value:
                 return self.changeID(target_username=target_user, detail=detail)
-            case OperationList.CHANGE_PASSWORD:
+            case OperationList.CHANGE_PASSWORD.value:
                 return self.changePassword(target_username=target_user, detail=detail)
             case _:
-                return ErrorList.INVALID_OPERATION
+                return ErrorList.INVALID_OPERATION.value
 
     def searchUser(self, target_username:str) -> str:
         self.conn.search(
@@ -86,19 +86,19 @@ class Operation():
 
         if not self.conn.entries:
             log.write(f"User {target_username} not found.")
-            return ReturnList.NOT_FOUND
+            return ReturnList.NOT_FOUND.value
         else:
             user_entry:Entry = self.conn.entries[0]
             user_dn = user_entry.entry_dn
-            return f"{ReturnList.OPERATION_OK}|{user_entry.cn}|{user_dn}"
+            return f"{ReturnList.OPERATION_OK.value}|{user_entry.cn}|{user_dn}"
                 
     def unlockAccount(self, target_username:str) -> str:
         self.conn.extend.microsoft.unlock_account(target_username)
         if(self.conn.result['result'] == 0):
             log.write("Conta desbloqueada")
-            return ReturnList.OPERATION_OK
+            return ReturnList.OPERATION_OK.value
         else:
-            return ReturnList.OPERATION_ERROR
+            return ReturnList.OPERATION_ERROR.value
     def changeID(self, target_username:str, detail:str) -> str:
         new_logon_id = detail
         domain = config.get("domain")
@@ -108,18 +108,18 @@ class Operation():
         })
         if(self.conn.result['result'] == 0):
             log.write(f"ID alterado para {new_logon_id}")
-            return ReturnList.OPERATION_OK
+            return ReturnList.OPERATION_OK.value
         else:
-            return ReturnList.OPERATION_ERROR
+            return ReturnList.OPERATION_ERROR.value
 
     def changePassword(self, target_username:str, detail:str) -> str:
         new_password = detail
         self.conn.extend.microsoft.unlock_account(target_username)
         self.conn.extend.microsoft.modify_password(target_username, new_password)
         if(self.conn.result['result'] == 0):
-            return ReturnList.OPERATION_OK
+            return ReturnList.OPERATION_OK.value
         else:
-            return ReturnList.OPERATION_ERROR
+            return ReturnList.OPERATION_ERROR.value
         
     def disconnect(self) -> None: #Encerra a sessão
         self.conn.unbind()

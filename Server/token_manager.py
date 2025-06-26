@@ -28,16 +28,16 @@ class TokenManager:
         try:
             if cls.token[request_token]["expires"] < time.time():
                 cls.token.pop(request_token)
-                return ErrorList.EXPIRED_TOKEN
+                return ErrorList.EXPIRED_TOKEN.value
             else:
-                return ReturnList.OPERATION_OK
+                return ReturnList.OPERATION_OK.value
         except KeyError:
-            return ErrorList.INVALID_TOKEN
+            return ErrorList.INVALID_TOKEN.value
         
     @classmethod
     def auth(cls, request_token:str) -> str:
         validation = cls.validate(request_token)
-        if (validation == ReturnList.OPERATION_OK):
+        if (validation == ReturnList.OPERATION_OK.value):
             cls.token[request_token]["expires"] = expiration_time()
             return cls.token[request_token]
         return validation

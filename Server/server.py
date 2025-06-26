@@ -26,15 +26,15 @@ log = log.Log_Handler()
 def handle_login(stripped_data: str) -> str:
     token, id, password = stripped_data
     token_auth:str = TokenManager.auth(token)
-    if (token_auth == ErrorList.INVALID_TOKEN):
+    if (token_auth == ErrorList.INVALID_TOKEN.value):
         t_SESSION = ad_helper.Operation(id=id, password=password)
-        if (t_SESSION.output == ReturnList.OPERATION_OK):
+        if (t_SESSION.output == ReturnList.OPERATION_OK.value):
             TokenManager.add_token(request_token=token,user=id,session=t_SESSION)
             log.write(f"{id} logged in.")
-            return ReturnList.OPERATION_OK
+            return ReturnList.OPERATION_OK.value
         else:
             log.write(f"Unsuccessful login attempt from {id}.")
-            return ReturnList.OPERATION_ERROR
+            return ReturnList.OPERATION_ERROR.value
     else:
         log.write("Already logged in.")
         raise ValueError
@@ -42,24 +42,25 @@ def handle_login(stripped_data: str) -> str:
 def handle_request(data: str) -> str:
     try:
         stripped_data = data.strip().split("|")
-        if len(stripped_data <= 2):
+        if len(stripped_data) <= 2:
             log.write("Invalid request.")
             raise SyntaxError
         token = stripped_data[0]
-        if(OperationList.AUTHENTICATE in stripped_data):
+        if(OperationList.AUTHENTICATE.value in stripped_data):
             return handle_login(stripped_data=stripped_data)
         else:
             SESSION = TokenManager.auth(token)
             if(type(SESSION)==dict):
                 output = SESSION["session"].handleRequest(stripped_data[1:]) #stripped_data[1:] does the request while skipping the first item, which should be the token
-                log.write(f"{SESSION["user"]} requested {stripped_data[0]}")
+                log.write(f"{SESSION['user']} requested {stripped_data[0]}")
                 return output
             else:
                 return SESSION
     except SyntaxError:
-        return ReturnList.OPERATION_ERROR
+        return ReturnList.OPERATION_ERROR.value
     except Exception as e:
-        return e
+        return str(e)
+
 def validate_request(data: str) -> bool:
     if("|" in data):
         return True
@@ -77,7 +78,7 @@ def client_thread(conn, addr) -> None:
                     log.write(f"No data from {addr}. Closing connection.")
                     break
                 decoded_data = data.decode('utf-8').strip()
-                if OperationList.AUTHENTICATE in decoded_data:
+                if OperationList.AUTHENTICATE.value in decoded_data:
                     log.write(f"Received login request from {addr}")
                 else:
                     log.write(f"Received from {addr}: {decoded_data}")
