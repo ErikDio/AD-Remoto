@@ -51,7 +51,7 @@ def run_gui():
             return
         usuario = f"{user}@{DOMAIN}"
         senha = password
-        if request("ping") != ReturnList.OPERATION_OK.value:
+        if request("ping") != "pong":
             messagebox.showerror("Erro", "Falha na conexão com o servidor.")
             return
         msg = request(f"{usuario}|{senha}|{OperationList.AUTHENTICATE.value}|Nan")
