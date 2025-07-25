@@ -34,9 +34,9 @@ def request(pedido) -> str:
         s.connect((HOST, PORT))
         s.sendall(msg.encode('utf-8'))
         data = s.recv(1024)
-        resposta = data.decode('utf-8')
+        resposta = data.decode('utf-8').strip()
         if pedido == "ping":
-            return "ok" if data else "erro"
+            return ReturnList.OPERATION_OK if data else ReturnList.OPERATION_ERROR
         else:
             return resposta
 
@@ -51,7 +51,7 @@ def run_gui():
             return
         usuario = f"{user}@{DOMAIN}"
         senha = password
-        if request("ping") != "pong":
+        if request("ping") != ReturnList.OPERATION_OK:
             messagebox.showerror("Erro", "Falha na conexão com o servidor.")
             return
         msg = request(f"{usuario}|{senha}|{OperationList.AUTHENTICATE.value}|Nan")
