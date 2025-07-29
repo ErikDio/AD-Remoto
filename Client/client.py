@@ -55,6 +55,7 @@ def run_gui():
             messagebox.showerror("Erro", "Falha na conexão com o servidor.")
             return
         msg = request(f"{usuario}|{senha}|{OperationList.AUTHENTICATE.value}|Nan")
+        msg = request(f"{usuario}|{senha}|{OperationList.AUTHENTICATE.value}")
         if msg != ReturnList.OPERATION_OK.value:
             messagebox.showerror("Erro", "Usuário ou senha inválidos.")
             return
