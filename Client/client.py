@@ -54,7 +54,6 @@ def run_gui():
         if request("ping") != ReturnList.OPERATION_OK:
             messagebox.showerror("Erro", "Falha na conexão com o servidor.")
             return
-        msg = request(f"{usuario}|{senha}|{OperationList.AUTHENTICATE.value}|Nan")
         msg = request(f"{usuario}|{senha}|{OperationList.AUTHENTICATE.value}")
         if msg != ReturnList.OPERATION_OK.value:
             messagebox.showerror("Erro", "Usuário ou senha inválidos.")
@@ -65,11 +64,14 @@ def run_gui():
 
     def pesquisar_usuario() -> None:
         user_id = entry_id.get()
-        resposta = request(f"{OperationList.SEARCH_USER.value}|{user_id}|Nan")
+        resposta = request(f"{OperationList.SEARCH_USER.value}|{user_id}")
         if resposta == "Nan":
             messagebox.showerror("Erro", "Usuário não encontrado.")
             return
-        info, dn = resposta.split("|")
+        elif "|" not in resposta:
+            messagebox.showerror("Falha", "Erro ao pesquisar o usuário, tente novamente.")
+            return
+        status, info, dn = resposta.split("|")
         if(FILTER != "Nan" and FILTER not in dn):
             messagebox.showerror("Erro", f"O usuário está fora da OU {FILTER}.")
             return
@@ -81,8 +83,8 @@ def run_gui():
 
     def desbloquear() -> None:
         dn = current_dn
-        resposta = request(f"{OperationList.UNLOCK_ACCOUNT.value}|{dn}|Nan")
-        messagebox.showinfo("Resultado", "Sucesso ao desbloquear a conta." if resposta == "ok" else "Erro ao desbloquear a conta.")
+        resposta = request(f"{OperationList.UNLOCK_ACCOUNT.value}|{dn}")
+        messagebox.showinfo("Resultado", "Sucesso ao desbloquear a conta." if ReturnList.OPERATION_OK.value in resposta[0:3] else "Erro ao desbloquear a conta.")
 
     def alterar_senha() -> None:
         dn = current_dn
@@ -90,7 +92,7 @@ def run_gui():
         if not nova:
             return
         resposta = request(f"{OperationList.CHANGE_PASSWORD.value}|{dn}|{nova}")
-        messagebox.showinfo("Resultado", "Sucesso ao alterar a senha." if resposta == "ok" else "Erro ao alterar a senha.")
+        messagebox.showinfo("Resultado", "Sucesso ao alterar a senha." if ReturnList.OPERATION_OK.value in resposta[0:3] else "Erro ao alterar a senha.")
 
     def alterar_id() -> None:
         dn = current_dn
@@ -98,7 +100,7 @@ def run_gui():
         if not novo:
             return
         resposta = request(f"{OperationList.CHANGE_ID.value}|{dn}|{novo}")
-        messagebox.showinfo("Resultado", "Sucesso ao alterar o ID." if resposta == "ok" else "Erro ao alterar o ID.")
+        messagebox.showinfo("Resultado", "Sucesso ao alterar o ID." if ReturnList.OPERATION_OK.value in resposta[0:3] else "Erro ao alterar o ID.")
 
     root = tk.Tk()
     root.title("Client GUI")
