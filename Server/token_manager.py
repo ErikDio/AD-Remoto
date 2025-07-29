@@ -45,7 +45,7 @@ class TokenManager:
     @classmethod
     def add_token(cls, request_token:str, user:str, session):
         expiration:float = expiration_time()
-        cls.token[request_token] = {"expires":expiration, "user":user, session:session}
+        cls.token[request_token] = {"expires":expiration, "user":user, "session":session}
 
 def expiration_time() -> float:
     return time.time() + (30*60)
