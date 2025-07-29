@@ -23,7 +23,7 @@ PORT = config.get("PORT", 7777)
 TIMEOUT = 300  # Seconds
 log = log.Log_Handler()
 
-def handle_login(stripped_data: str) -> str:
+def handle_login(stripped_data: list) -> str:
     token, id, password = stripped_data
     token_auth:str = TokenManager.auth(token)
     if (token_auth == ErrorList.INVALID_TOKEN.value):

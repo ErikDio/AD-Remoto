@@ -26,7 +26,7 @@ class Operation():
     operation = ""
     conn:Connection = None
     
-    def __init__(self, user, password, op, target, det):
+    def __init__(self, user=None, password=None, op=None, target=None, det=None):
         bind_user = user
         bind_password = password
         self.target_username = target
