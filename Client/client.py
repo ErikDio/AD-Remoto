@@ -63,6 +63,7 @@ def run_gui():
         frame_main.pack()
 
     def pesquisar_usuario() -> None:
+        nonlocal current_dn
         user_id = entry_id.get()
         resposta = request(f"{OperationList.SEARCH_USER.value}|{user_id}")
         if resposta == "Nan":
