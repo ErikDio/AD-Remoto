@@ -41,18 +41,16 @@ class Operation():
             authentication=SIMPLE,
             auto_bind=True)
             if (self.operation == OperationList.AUTHENTICATE.value):
-                log.write("Conectado")
-                self.conn.unbind()
-                return_var = ReturnList.OPERATION_OK.value
-                self.output = return_var
+            log.write("Connected")
+            return_var = ReturnList.OPERATION_OK.value
 
         except ldap3.core.exceptions.LDAPBindError:
-            log.write("Erro ao autenticar.")
+            log.write("Authentication error.")
             return_var = ReturnList.OPERATION_ERROR.value
             self.output = return_var
             return
         except Exception as e:
-            log.write(f"Erro crítico ao tentar autenticar: {e}")
+            log.write(f"Critical error when trying to authenticate: {e}")
             self.output = ErrorList.CRITICAL_ERROR.value
             return
         log.write(return_var)
@@ -90,15 +88,18 @@ class Operation():
         else:
             user_entry:Entry = self.conn.entries[0]
             user_dn = user_entry.entry_dn
+            log.write(f"Found {target_username}: {user_dn}")
             return f"{ReturnList.OPERATION_OK.value}|{user_entry.cn}|{user_dn}"
-                
+
     def unlockAccount(self, target_username:str) -> str:
         self.conn.extend.microsoft.unlock_account(target_username)
         if(self.conn.result['result'] == 0):
             log.write("Conta desbloqueada")
             return ReturnList.OPERATION_OK.value
         else:
+            log.write(f"Error unlocking account: {self.conn.result}")
             return ReturnList.OPERATION_ERROR.value
+        
     def changeID(self, target_username:str, detail:str) -> str:
         new_logon_id = detail
         domain = config.get("domain")
@@ -110,16 +111,18 @@ class Operation():
             log.write(f"ID alterado para {new_logon_id}")
             return ReturnList.OPERATION_OK.value
         else:
+            log.write(f"Error changing ID: {self.conn.result}")
             return ReturnList.OPERATION_ERROR.value
 
     def changePassword(self, target_username:str, detail:str) -> str:
-        new_password = detail
         self.conn.extend.microsoft.unlock_account(target_username)
         self.conn.extend.microsoft.modify_password(target_username, new_password)
         if(self.conn.result['result'] == 0):
             return ReturnList.OPERATION_OK.value
         else:
+            log.write(f"Error changing password: {self.conn.result}")
             return ReturnList.OPERATION_ERROR.value
+            
         
-    def disconnect(self) -> None: #Encerra a sessão
+    def disconnect(self) -> None: #Finishes the session
         self.conn.unbind()

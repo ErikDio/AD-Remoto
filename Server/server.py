@@ -24,20 +24,23 @@ TIMEOUT = 300  # Seconds
 log = log.Log_Handler()
 
 def handle_login(stripped_data: list) -> str:
-    token, id, password = stripped_data
+    token, user, password, request = stripped_data
     token_auth:str = TokenManager.auth(token)
-    if (token_auth == ErrorList.INVALID_TOKEN.value):
-        t_SESSION = ad_helper.Operation(id=id, password=password)
-        if (t_SESSION.output == ReturnList.OPERATION_OK.value):
-            TokenManager.add_token(request_token=token,user=id,session=t_SESSION)
-            log.write(f"{id} logged in.")
-            return ReturnList.OPERATION_OK.value
+    try:
+        if (token_auth == ErrorList.INVALID_TOKEN.value):
+            t_SESSION = ad_helper.Operation(user=user, password=password)
+            if (t_SESSION.output == ReturnList.OPERATION_OK.value):
+                TokenManager.add_token(request_token=token,user=user,session=t_SESSION)
+                log.write(f"{user} logged in.")
+                return ReturnList.OPERATION_OK.value
+            else:
+                log.write(f"Unsuccessful login attempt from {user}. Reason: {t_SESSION.output}")
+                return ReturnList.OPERATION_ERROR.value
         else:
-            log.write(f"Unsuccessful login attempt from {id}.")
-            return ReturnList.OPERATION_ERROR.value
-    else:
-        log.write("Already logged in.")
-        raise ValueError
+            log.write("Already logged in.")
+            raise ValueError
+    except Exception as e:
+        log.write(e)
 
 def handle_request(data: str) -> str:
     try:
@@ -52,7 +55,7 @@ def handle_request(data: str) -> str:
             SESSION = TokenManager.auth(token)
             if(type(SESSION)==dict):
                 output = SESSION["session"].handleRequest(stripped_data[1:]) #stripped_data[1:] does the request while skipping the first item, which should be the token
-                log.write(f"{SESSION['user']} requested {stripped_data[0]}")
+                log.write(f"{SESSION['user']} requested {stripped_data[1:]}\nAnswering '{output}'")
                 return output
             else:
                 return SESSION
