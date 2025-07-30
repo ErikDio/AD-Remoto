@@ -114,6 +114,7 @@ class Operation():
             return ReturnList.OPERATION_ERROR.value
 
     def changePassword(self, target_username:str, detail:str) -> str:
+        new_password = detail
         self.conn.extend.microsoft.unlock_account(target_username)
         self.conn.extend.microsoft.modify_password(target_username, new_password)
         if(self.conn.result['result'] == 0):
