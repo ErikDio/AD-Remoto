@@ -40,7 +40,6 @@ class Operation():
             password=bind_password,
             authentication=SIMPLE,
             auto_bind=True)
-            if (self.operation == OperationList.AUTHENTICATE.value):
             log.write("Connected")
             return_var = ReturnList.OPERATION_OK.value
 
