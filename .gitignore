@@ -1,4 +1,5 @@
 Server/ad_service.log
 **/__pycache__/
 **/config.json
+**.old
 Client/config.json
