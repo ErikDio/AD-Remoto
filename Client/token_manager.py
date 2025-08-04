@@ -11,7 +11,7 @@ class TokenManager:
     def get_token(cls) -> str:
         if cls.token != None:
             return cls.token
-        raise ValueError("Token inválido")
+        raise ValueError("Invalid Token")
 
     @classmethod
     def clear_token(cls) -> None:

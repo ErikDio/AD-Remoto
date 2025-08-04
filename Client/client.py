@@ -66,22 +66,32 @@ def run_gui():
         nonlocal current_dn
         user_id = entry_id.get()
         resposta = request(f"{OperationList.SEARCH_USER.value}|{user_id}")
-        if resposta == "Nan":
+        if resposta == ReturnList.NOT_FOUND.value:
             messagebox.showerror("Erro", "Usuário não encontrado.")
             return
-        elif "|" not in resposta:
-            messagebox.showerror("Falha", "Erro ao pesquisar o usuário, tente novamente.")
+        elif "|" not in resposta or resposta.count("|")<3:
+            messagebox.showerror("Falha", "Erro inesperado ao pesquisar o usuário, tente novamente.")
             return
         status, info, dn = resposta.split("|")
         if(FILTER != "Nan" and FILTER not in dn):
             messagebox.showerror("Erro", f"O usuário está fora da OU {FILTER}.")
             return
-        label_info.config(text=f"Usuário: {info}")
-        btn_unlock.config(state=tk.NORMAL)
-        btn_pass.config(state=tk.NORMAL)
-        btn_id.config(state=tk.NORMAL)
         current_dn = dn
 
+        components = dn.split(',')
+        # Coletar DCs para o domínio
+        domain_parts = [c.split('=')[1] for c in components if c.startswith('DC=')]
+        domain = '.'.join(domain_parts)
+        # Coletar OUs e CN (em ordem reversa para formar o caminho)
+        path_parts = [c.split('=')[1] for c in components if c.startswith(('OU=', 'CN='))]
+        path_parts.reverse()
+        # Montar caminho
+        windows_path = f"{domain}\\" + '\\'.join(path_parts)
+        label_dn.config(text=f"Local: {windows_path}")
+        label_info.config(text=f"Usuário: {info}")
+        btn_pass.config(state=tk.NORMAL)
+        btn_id.config(state=tk.NORMAL)
+        btn_unlock.config(state=tk.NORMAL)
     def desbloquear() -> None:
         dn = current_dn
         resposta = request(f"{OperationList.UNLOCK_ACCOUNT.value}|{dn}")
@@ -126,6 +136,7 @@ def run_gui():
     label_info.pack(pady=10)
     label_dn = tk.Label(frame_main, text="DN: ", font=("Arial", 14))
     label_dn.pack(pady=5)
+
     frame_actions = tk.Frame(frame_main)
     btn_unlock = tk.Button(frame_actions, text="Desbloquear Conta", font=("Arial", 14, "bold"), width=18, height=2, bg="#FF9800", fg="white", command=desbloquear, state=tk.DISABLED)
     btn_pass = tk.Button(frame_actions, text="Alterar Senha", font=("Arial", 14, "bold"), width=18, height=2, bg="#9C27B0", fg="white", command=alterar_senha, state=tk.DISABLED)

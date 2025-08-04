@@ -11,6 +11,7 @@ class ErrorList(Enum):
     INVALID_TOKEN = "invalid"
     INVALID_OPERATION = "invalidOperation"
     CRITICAL_ERROR = "critical"
+    CONNECTION_ERROR = "connectionError"
 
 class ReturnList(Enum):
     OPERATION_OK = "ok"
