@@ -80,12 +80,16 @@ def run_gui():
 
     def pesquisar_usuario() -> None:
         nonlocal current_dn
+        current_dn = None
+        label_info.config(text=f"")
+        label_dn.config(text=f"")
+
         user_id = entry_id.get()
         resposta = request(f"{OperationList.SEARCH_USER.value}|{user_id}")
         if resposta == ReturnList.NOT_FOUND.value:
             messagebox.showerror("Erro", "Usuário não encontrado.")
             return
-        elif "|" not in resposta or resposta.count("|")<3:
+        elif "|" not in resposta or resposta.count("|")<2:
             messagebox.showerror("Falha", "Erro inesperado ao pesquisar o usuário, tente novamente.")
             return
         status, info, dn = resposta.split("|")
@@ -103,8 +107,8 @@ def run_gui():
         path_parts.reverse()
         # Montar caminho
         windows_path = f"{domain}\\" + '\\'.join(path_parts)
-        label_dn.config(text=f"Local: {windows_path}")
         label_info.config(text=f"Usuário: {info}")
+        label_dn.config(text=f"Local: {windows_path}")
         btn_pass.config(state=tk.NORMAL)
         btn_id.config(state=tk.NORMAL)
         btn_unlock.config(state=tk.NORMAL)
@@ -148,9 +152,9 @@ def run_gui():
     entry_id = tk.Entry(frame_main, font=("Arial", 16), width=30)
     entry_id.pack(pady=10)
     tk.Button(frame_main, text="Pesquisar", font=("Arial", 16, "bold"), width=15, height=2, bg="#2196F3", fg="white", command=pesquisar_usuario).pack(pady=20)
-    label_info = tk.Label(frame_main, text="Usuário: ", font=("Arial", 16))
+    label_info = tk.Label(frame_main, text="", font=("Arial", 16))
     label_info.pack(pady=10)
-    label_dn = tk.Label(frame_main, text="DN: ", font=("Arial", 14))
+    label_dn = tk.Label(frame_main, text="", font=("Arial", 14))
     label_dn.pack(pady=5)
 
     frame_actions = tk.Frame(frame_main)
