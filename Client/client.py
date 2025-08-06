@@ -29,19 +29,35 @@ def request(pedido) -> str:
     try:
         msg = f'{TokenManager.get_token()}|{pedido}'#token|operação|alvo|detalhe
     except ValueError as e:
-        return str(e)
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.connect((HOST, PORT))
-        s.sendall(msg.encode('utf-8'))
-        data = s.recv(1024)
-        resposta = data.decode('utf-8').strip()
-        if pedido == "ping":
-            return ReturnList.OPERATION_OK if data else ReturnList.OPERATION_ERROR
-        else:
-            return resposta
+        return ErrorList.INVALID_TOKEN.value
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            #Tries to connect to the server and sets a 15 second timeout for the operations
+            s.settimeout(15)
+            result = s.connect_ex((HOST, PORT))
+            if result != 0: 
+                return ErrorList.CONNECTION_ERROR.value
+            
+            s.sendall(msg.encode('utf-8'))
+            data = s.recv(1024)
+            resposta = data.decode('utf-8').strip()
+            if pedido == "ping":
+                return ReturnList.OPERATION_OK if data else ReturnList.OPERATION_ERROR
+            else:
+                return resposta
+    except Exception as e:
+        messagebox.showerror("Erro", "Falha na conexão com o servidor.")
 
 def run_gui():
     current_dn:str = None
+
+    def show_login():
+        frame_main.pack_forget()
+        frame_login.pack(expand=True)
+
+    def show_main():
+        frame_login.pack_forget()
+        frame_main.pack()
 
     def authenticate() -> None:
         user = entry_user.get()
@@ -51,16 +67,16 @@ def run_gui():
             return
         usuario = f"{user}@{DOMAIN}"
         senha = password
-        if request("ping") != ReturnList.OPERATION_OK:
-            messagebox.showerror("Erro", "Falha na conexão com o servidor.")
-            return
         msg = request(f"{usuario}|{senha}|{OperationList.AUTHENTICATE.value}")
+        if msg in (ErrorList.INVALID_TOKEN.value, ErrorList.EXPIRED_TOKEN.value):
+            messagebox.showerror("Sessão expirada", "Sua sessão expirou. Faça login novamente.")
+            TokenManager.clear_token()
+            show_login()
+            return
         if msg != ReturnList.OPERATION_OK.value:
             messagebox.showerror("Erro", "Usuário ou senha inválidos.")
             return
-        
-        frame_login.pack_forget()
-        frame_main.pack()
+        show_main()
 
     def pesquisar_usuario() -> None:
         nonlocal current_dn
