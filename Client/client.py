@@ -33,7 +33,7 @@ def request(pedido) -> str:
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             #Tries to connect to the server and sets a 15 second timeout for the operations
-            s.settimeout(15)
+            s.settimeout(30)
             result = s.connect_ex((HOST, PORT))
             if result != 0: 
                 return ErrorList.CONNECTION_ERROR.value
