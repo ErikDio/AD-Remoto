@@ -1,4 +1,5 @@
 {
+    "VERBOSE_LOG": false,
     "HOST": "0.0.0.0",
     "PORT": 7777,
     "fqdn": "HOST.EXAMPLE.CORP",

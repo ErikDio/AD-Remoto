@@ -20,6 +20,7 @@ with open(CONFIG_PATH, "r") as f:
 
 HOST = config.get("HOST", "0.0.0.0")
 PORT = config.get("PORT", 7777)
+VERBOSE = config.get("VERBOSE_LOG", False)
 TIMEOUT = 300  # Seconds
 log = log.Log_Handler()
 
@@ -78,7 +79,8 @@ def client_thread(conn, addr) -> None:
             try:
                 data = conn.recv(1024)
                 if(not data):
-                    log.write(f"No data from {addr}. Closing connection.")
+                    if VERBOSE:
+                        log.write(f"No data from {addr}. Closing connection.")
                     break
                 decoded_data = data.decode('utf-8').strip()
                 if OperationList.AUTHENTICATE.value in decoded_data:
@@ -94,7 +96,8 @@ def client_thread(conn, addr) -> None:
                 else:
                     raise SyntaxError
             except socket.timeout:
-                log.write(f"Connection with {addr} timed out after {TIMEOUT} seconds.")
+                if VERBOSE:
+                    log.write(f"Connection with {addr} timed out after {TIMEOUT} seconds.")
                 break
             except SyntaxError:
                 log.write(f"Invalid request.")
@@ -105,8 +108,8 @@ def client_thread(conn, addr) -> None:
                 except:
                     log.write(f"Error sending \"{e}\" to {addr}")
                 break
-
-    log.write(f"Connection closed with {addr}")
+    if VERBOSE:
+        log.write(f"Connection closed with {addr}")
     
 def main():
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
