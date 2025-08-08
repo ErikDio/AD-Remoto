@@ -1,4 +1,5 @@
 Server/ad_service.log
+**/build/
 **/__pycache__/
 **/config.json
 **.old
