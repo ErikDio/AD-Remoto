@@ -36,7 +36,9 @@ def request(pedido) -> str:
             #Tries to connect to the server and sets a 15 second timeout for the operations
             s.settimeout(30)
             result = s.connect_ex((HOST, PORT))
+
             if result != 0: 
+                messagebox.showerror("Erro", "Servidor inacessível.\nEntre em contato com o administrador da rede, ou tente novamente mais tarde")
                 return ErrorList.CONNECTION_ERROR.value
             
             s.sendall(msg.encode('utf-8'))
@@ -70,9 +72,10 @@ def run_gui():
         senha = password
         TokenManager.set_token()
         msg = request(f"{usuario}|{senha}|{OperationList.AUTHENTICATE.value}")
-        if msg != ReturnList.OPERATION_OK.value:
-            messagebox.showerror("Erro", "Usuário ou senha inválidos.")
-            return
+        if msg not in (ReturnList.OPERATION_OK.value):
+            if msg != ErrorList.CONNECTION_ERROR.value:
+                messagebox.showerror("Erro", "Usuário ou senha inválidos.")
+            return        
         show_main()
 
     def check_session(resposta) -> bool:
