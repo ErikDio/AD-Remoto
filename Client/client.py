@@ -83,6 +83,9 @@ def run_gui():
         return True
     
     def pesquisar_usuario() -> None:
+        btn_pass.config(state=tk.DISABLED)
+        btn_id.config(state=tk.DISABLED)
+        btn_unlock.config(state=tk.DISABLED)
         nonlocal current_dn
         current_dn = None
         label_info.config(text=f"")
