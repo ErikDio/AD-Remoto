@@ -111,7 +111,7 @@ def client_thread(conn, addr) -> None:
     if VERBOSE:
         log.write(f"Connection closed with {addr}")
     
-def main():
+def start_server():
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.bind((HOST, PORT))
         s.listen()
@@ -123,4 +123,4 @@ def main():
             thread.start()
 
 if __name__ == "__main__":
-    main()
+    start_server()
