@@ -11,7 +11,7 @@ from .token_manager import TokenManager
 config:dict
 # Load configuration from config.json (support frozen apps)
 if getattr(sys, 'frozen', False):
-    base_path = sys._MEIPASS
+    base_path = os.path.dirname(sys.executable)
 else:
     base_path = os.path.dirname(__file__)
 CONFIG_PATH = os.path.join(base_path, "config.json")
